@@ -11,8 +11,8 @@ const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
   const {status} = React.useContext(AuthContext);
 
-  if (status === 'checking') return <LoadingScreen />;
-
+  /* if (status === 'checking') return <LoadingScreen />; */
+  console.log(status, 'status');
   return (
     <Stack.Navigator>
       {status !== 'authenticated' ? (
