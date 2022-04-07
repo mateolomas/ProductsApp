@@ -5,6 +5,7 @@ import {RegisterScreen} from '../screens/RegisterScreen';
 import {AuthContext} from '../context/AuthContext';
 import ProtectedScreen from '../screens/ProtectedScreen';
 import LoadingScreen from '../screens/LoadingScreen';
+import ProductsNavigator from './ProductsNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,13 +34,20 @@ const StackNavigator = () => {
           />
         </>
       ) : (
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name="ProtectedScreen"
-          component={ProtectedScreen}
-        />
+        <>
+          <Stack.Screen
+            options={{headerShown: false}}
+            name="ProductsNavigator"
+            component={ProductsNavigator}
+          />
+          <Stack.Screen
+            options={{
+              headerShown: false,
+            }}
+            name="ProtectedScreen"
+            component={ProtectedScreen}
+          />
+        </>
       )}
     </Stack.Navigator>
   );
