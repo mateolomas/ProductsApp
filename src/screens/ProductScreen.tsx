@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   Text,
   View,
@@ -16,6 +16,7 @@ import {useCategories} from '../hooks/useCategories';
 import {useForm} from '../hooks/useForm';
 import {ProductsContext} from '../context/ProductsContext';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 interface Props
   extends NativeStackScreenProps<ProductsStackParams, 'ProductScreen'> {}
@@ -24,8 +25,10 @@ export const ProductScreen = ({navigation, route}: Props) => {
   const {id = '', name = ''} = route.params;
 
   const {categories} = useCategories();
-  const {loadProductById, addProduct, updateProduct} =
+  const {loadProductById, addProduct, updateProduct, uploadImage} =
     useContext(ProductsContext);
+
+  const [tempUri, setTempUri] = useState<string>();
 
   const {_id, categoriaId, nombre, img, form, onChange, setFormValue} = useForm(
     {
@@ -67,6 +70,39 @@ export const ProductScreen = ({navigation, route}: Props) => {
     }
   };
 
+  const takePhoto = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        quality: 0.5,
+      },
+      resp => {
+        if (resp.didCancel) return;
+        if (!resp.uri) return;
+
+        setTempUri(resp.uri);
+        console.log(resp);
+        uploadImage(resp, _id);
+      },
+    );
+  };
+
+  const takePhotoFromGallery = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 0.5,
+      },
+      resp => {
+        if (resp.didCancel) return;
+        if (!resp.uri) return;
+
+        setTempUri(resp.uri);
+        uploadImage(resp, _id);
+      },
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -100,7 +136,7 @@ export const ProductScreen = ({navigation, route}: Props) => {
             <Button
               title="Cámara"
               // TODO: Por hacer
-              onPress={() => {}}
+              onPress={takePhoto}
               color="#5856D6"
             />
 
@@ -109,13 +145,13 @@ export const ProductScreen = ({navigation, route}: Props) => {
             <Button
               title="Galería"
               // TODO: Por hacer
-              onPress={() => {}}
+              onPress={takePhotoFromGallery}
               color="#5856D6"
             />
           </View>
         )}
 
-        {img.length > 0 && (
+        {img.length > 0 && !tempUri && (
           <Image
             source={{uri: img}}
             style={{
@@ -127,6 +163,17 @@ export const ProductScreen = ({navigation, route}: Props) => {
         )}
 
         {/* TODO: Mostrar imagen temporal */}
+        {tempUri && (
+          <Image
+            source={{uri: tempUri}}
+            style={{
+              marginTop: 20,
+              width: '100%',
+              height: 300,
+            }}
+          />
+        )}
+        <Text>{tempUri}</Text>
       </ScrollView>
     </View>
   );
